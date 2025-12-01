@@ -1366,9 +1366,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 ## 📞 Contact & Support
-
-- **Issues**: [GitHub Issues](https://github.com/yourusername/nutrigreen/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/nutrigreen/discussions)
 - **Email**: lokeshh1219.email@example.com
 
 ---
