@@ -1,0 +1,66 @@
+# NutriGreen - Requirements File
+# Python 3.8+
+
+# Core Framework
+streamlit>=1.28.0
+streamlit-option-menu>=0.3.6
+
+# Deep Learning & Computer Vision
+torch>=2.0.0
+torchvision>=0.15.0
+torchaudio>=2.0.0
+transformers>=4.35.0
+accelerate>=0.24.0
+bitsandbytes>=0.41.0
+sentencepiece>=0.1.99
+protobuf>=3.20.0
+
+# YOLOv5 Dependencies
+# Note: Clone YOLOv5 separately and install its requirements
+opencv-python>=4.8.0
+opencv-python-headless>=4.8.0
+
+# Vision Models
+pillow>=10.0.0
+
+# OpenAI (for Premium mode)
+openai>=1.3.0
+
+# Database & Search
+faiss-cpu>=1.7.4
+# For GPU: faiss-gpu>=1.7.4
+sentence-transformers>=2.2.2
+
+# Data Science & Analysis
+pandas>=2.0.0
+numpy>=1.24.0
+scipy>=1.10.0
+
+# Visualization
+plotly>=5.17.0
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Image Processing
+pytesseract>=0.3.10
+# Note: Requires Tesseract OCR installed on system
+
+# Utilities
+python-dotenv>=1.0.0
+requests>=2.31.0
+tqdm>=4.66.0
+
+# Optional: For notebook execution
+jupyter>=1.0.0
+ipykernel>=6.25.0
+ipywidgets>=8.1.0
+
+# Optional: For development
+pytest>=7.4.0
+black>=23.9.0
+flake8>=6.1.0
+mypy>=1.5.0
+
+# Optional: For documentation
+sphinx>=7.2.0
+sphinx-rtd-theme>=1.3.0

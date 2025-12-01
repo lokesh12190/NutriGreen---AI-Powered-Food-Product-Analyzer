@@ -1,0 +1,11 @@
+{
+  "total": 7271,
+  "processed": 7271,
+  "successful": 7271,
+  "failed": 0,
+  "with_nutrition": 0,
+  "with_allergens": 3076,
+  "start_time": "2025-11-29T19:58:50.281611",
+  "end_time": "2025-11-30T09:34:47.400064",
+  "duration": 48957.118453
+}

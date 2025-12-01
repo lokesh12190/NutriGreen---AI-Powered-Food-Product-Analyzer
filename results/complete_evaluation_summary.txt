@@ -1,0 +1,75 @@
+
+================================================================================
+NUTRIGREEN MODEL - COMPLETE EVALUATION REPORT
+================================================================================
+
+Model Configuration:
+  Architecture: YOLOv5
+  Weights: best.pt
+  Dataset: NutriGreen Food Labels
+  Classes: 7
+
+Dataset Split:
+  Training Images: 5089
+  Validation Images: 1090
+  Test Images: 1092
+
+
+Training Summary:
+  Total Epochs: 25
+  Final Training Loss: 0.0233
+  Final Validation Loss: 0.0163
+  Best mAP@0.5: 0.9926 (Epoch 17)
+  Best mAP@0.5:0.95: 0.8858 (Epoch 24)
+
+Final Validation Metrics (Last Epoch):
+  Precision: 0.9923
+  Recall: 0.9810
+  mAP@0.5: 0.9924
+  mAP@0.5:0.95: 0.8858
+
+Classes Detected:
+  0: NutriScore A
+  1: NutriScore B
+  2: NutriScore C
+  3: NutriScore D
+  4: NutriScore E
+  5: BIO
+  6: V-Label
+
+Output Locations:
+  Validation Results: C:\Users\lokes\Desktop\ironhack\final_project\dataset\dataset\runs\nutrigreen_val
+  Detection Examples: C:\Users\lokes\Desktop\ironhack\final_project\dataset\dataset\runs\nutrigreen_detections
+  Training History: C:\Users\lokes\Desktop\ironhack\final_project\dataset\dataset\runs\nutrigreen_exp
+
+Generated Files:
+  ✓ Training History Plot
+  ✗ Test Metrics Plot (not generated)
+  ✓ All Metrics CSV
+  ✓ Confusion Matrix
+  ✓ PR Curve
+  ✓ F1 Curve
+  ✓ Performance Curves
+  ✗ Detection Examples (not generated)
+
+================================================================================
+EVALUATION COMPLETE!
+================================================================================
+
+Model Status: READY FOR DEPLOYMENT ✓
+
+Next Steps:
+  1. Review all metrics and visualizations
+  2. Check confusion matrix for class-wise performance
+  3. Examine detection examples on test images
+  4. Deploy model: streamlit run nutrigreen_app.py
+  5. Test on new images via Streamlit interface
+
+For detailed analysis, review:
+  • Complete training history plot
+  • Per-class performance curves  
+  • Confusion matrix
+  • Sample detection results
+
+Model is production-ready! 🚀
+================================================================================
