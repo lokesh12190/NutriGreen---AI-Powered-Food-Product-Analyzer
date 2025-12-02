@@ -586,7 +586,16 @@ elif selected == "Compare Products":
                 
                 # Winner
                 winner = max(analyzed_products, key=lambda x: x['health_score'])
-                st.success(f"🏆 **Winner:** Product {winner['id']} ({winner['filename']}) - Health Score: {winner['health_score']:.0f}/100")
+                
+                # Check if there's a tie
+                max_score = winner['health_score']
+                winners = [p for p in analyzed_products if p['health_score'] == max_score]
+                
+                if len(winners) == len(analyzed_products):
+                    st.info(f"🤝 **It's a Tie!** All products have the same health score ({max_score:.0f}/100)")
+                    st.caption("💡 Check the detailed AI analysis below for key differences")
+                else:
+                    st.success(f"🏆 **Winner:** Product {winner['id']} ({winner['filename']}) - Health Score: {winner['health_score']:.0f}/100")
                 
                 # Radar Chart
                 st.markdown("### 📈 Visual Comparison")
@@ -627,6 +636,26 @@ elif selected == "Compare Products":
                 # Detailed Analysis
                 st.markdown("---")
                 st.markdown("### 🔍 Detailed Analysis")
+                
+                # Add AI Insights Summary
+                if all('analysis' in p and p['analysis'] for p in analyzed_products):
+                    st.info("💡 **Key Insights from AI Analysis:**")
+                    
+                    insights_cols = st.columns(len(analyzed_products))
+                    for idx, (col, product) in enumerate(zip(insights_cols, analyzed_products)):
+                        with col:
+                            st.markdown(f"**Product {product['id']}**")
+                            
+                            # Try to extract key info from analysis
+                            analysis_text = product['analysis']
+                            
+                            # Show brief summary
+                            if len(analysis_text) > 200:
+                                st.caption(analysis_text[:200] + "...")
+                            else:
+                                st.caption(analysis_text)
+                    
+                    st.markdown("---")
                 
                 for product in analyzed_products:
                     with st.expander(f"Product {product['id']}: {product['filename']}"):
@@ -688,38 +717,108 @@ elif selected == "Nutrition Calculator":
             standard = st.selectbox("Nutrition Standard", ["EU", "US"])
             
             if st.button("🧮 Calculate Nutrition", type="primary", width="stretch"):
-                with st.spinner("Analyzing nutrition facts..."):
+                with st.spinner("Analyzing nutrition facts... (this may take 30-60 seconds on first run)"):
                     # Import OCR
                     try:
-                        from paddleocr import PaddleOCR
+                        import easyocr
                         import re
                         
-                        # Initialize OCR
-                        ocr = PaddleOCR(use_textline_orientation=True, lang='en')
+                        # Initialize OCR (show progress)
+                        progress_text = st.empty()
+                        progress_text.info("📥 Loading OCR model...")
+                        
+                        reader = easyocr.Reader(['en', 'es'], gpu=torch.cuda.is_available(), verbose=False)
+                        
+                        progress_text.info("🔍 Extracting text from image...")
                         
                         # Extract text
-                        img_array = np.array(image)
-                        result = ocr.ocr(img_array, cls=True)
+                        ocr_results = reader.readtext(np.array(image))
                         
-                        # Extract nutrition values
-                        text_parts = []
-                        if result and result[0]:
-                            for line in result[0]:
-                                text_parts.append(line[1][0])
+                        progress_text.empty()
                         
-                        full_text = ' '.join(text_parts).lower()
+                        # Combine all text
+                        text_parts = [text for _, text, _ in ocr_results]
+                        full_text = ' '.join(text_parts)
                         
-                        # Nutrition patterns
+                        # Debug: show extracted text
+                        if not text_parts:
+                            st.warning("⚠️ No text detected. Try a clearer image.")
+                            st.stop()
+                        
+                        # Convert to lowercase for pattern matching
+                        full_text_lower = full_text.lower()
+                        
+                        # Enhanced nutrition patterns for Spanish
                         nutrition_patterns = {
-                            'calories': r'(calories?|kcal|energie|energy)[:\\s]*([0-9]+[.,]?[0-9]*)',
-                            'total_fat': r'(fat|fett|graisses?|matières?\\s*grasses?)[:\\s]*([0-9]+[.,]?[0-9]*)\\s*g',
-                            'saturated_fat': r'(saturated|gesättigt|saturées?)[:\\s]*([0-9]+[.,]?[0-9]*)\\s*g',
-                            'carbohydrates': r'(carbohydrat|glucid|kohlenhydrat)[:\\s]*([0-9]+[.,]?[0-9]*)\\s*g',
-                            'sugars': r'(sugar|zucker|sucres?)[:\\s]*([0-9]+[.,]?[0-9]*)\\s*g',
-                            'protein': r'(protein|eiweiß|protéin)[:\\s]*([0-9]+[.,]?[0-9]*)\\s*g',
-                            'salt': r'(salt|salz|sel)[:\\s]*([0-9]+[.,]?[0-9]*)\\s*g',
-                            'fiber': r'(fiber|fibre|ballaststoff)[:\\s]*([0-9]+[.,]?[0-9]*)\\s*g'
+                            'calories': [
+                                r'valor\s*energético[:\s]*([0-9]+)[,.]?([0-9]*)\s*k?cal',
+                                r'energía[:\s]*([0-9]+)[,.]?([0-9]*)\s*k?cal',
+                                r'energy[:\s]*([0-9]+)[,.]?([0-9]*)\s*k?cal',
+                                r'([0-9]+)[,.]?([0-9]*)\s*kcal'
+                            ],
+                            'total_fat': [
+                                r'grasas?[:\s]*([0-9]+)[,.]?([0-9]*)\s*g',
+                                r'fat[:\s]*([0-9]+)[,.]?([0-9]*)\s*g'
+                            ],
+                            'saturated_fat': [
+                                r'saturadas?[:\s]*([0-9]+)[,.]?([0-9]*)\s*g',
+                                r'saturated[:\s]*([0-9]+)[,.]?([0-9]*)\s*g'
+                            ],
+                            'carbohydrates': [
+                                r'hidratos?\s*de\s*carbono[:\s]*([0-9]+)[,.]?([0-9]*)\s*g',
+                                r'carbohidrat[:\s]*([0-9]+)[,.]?([0-9]*)\s*g'
+                            ],
+                            'sugars': [
+                                r'azúcares?[:\s]*([0-9]+)[,.]?([0-9]*)\s*g',
+                                r'sugars?[:\s]*([0-9]+)[,.]?([0-9]*)\s*g'
+                            ],
+                            'protein': [
+                                r'proteínas?[:\s]*([0-9]+)[,.]?([0-9]*)\s*g',
+                                r'proteins?[:\s]*([0-9]+)[,.]?([0-9]*)\s*g'
+                            ],
+                            'salt': [
+                                r'sal[:\s]*([0-9]+)[,.]?([0-9]*)\s*g',
+                                r'salt[:\s]*([0-9]+)[,.]?([0-9]*)\s*g'
+                            ],
+                            'fiber': [
+                                r'fibra[:\s]*([0-9]+)[,.]?([0-9]*)\s*g',
+                                r'fiber[:\s]*([0-9]+)[,.]?([0-9]*)\s*g'
+                            ]
                         }
+                        
+                        nutrition_data = {}
+                        
+                        # Try each pattern for each nutrient
+                        for nutrient, patterns in nutrition_patterns.items():
+                            for pattern in patterns:
+                                match = re.search(pattern, full_text_lower, re.IGNORECASE)
+                                if match:
+                                    try:
+                                        # Handle both single and two-group matches
+                                        if len(match.groups()) == 2:
+                                            int_part = match.group(1)
+                                            dec_part = match.group(2) if match.group(2) else '0'
+                                            value = float(f"{int_part}.{dec_part}")
+                                        else:
+                                            value = float(match.group(1).replace(',', '.'))
+                                        
+                                        nutrition_data[nutrient] = value
+                                        break  # Found it, move to next nutrient
+                                    except:
+                                        continue
+                        
+                        # Store in session state
+                        st.session_state['nutrition_data'] = nutrition_data
+                        st.session_state['serving_size'] = serving_size
+                        st.session_state['standard'] = standard
+                        st.session_state['ocr_text'] = full_text
+                        
+                        if not nutrition_data:
+                            st.warning("⚠️ No nutrition values detected. Try adjusting the image angle or brightness.")
+                        
+                    except Exception as e:
+                        st.error(f"Error extracting nutrition facts: {str(e)}")
+                        st.info("💡 Make sure the image clearly shows the nutrition facts table")
                         
                         nutrition_data = {}
                         for nutrient, pattern in nutrition_patterns.items():
@@ -745,10 +844,16 @@ elif selected == "Nutrition Calculator":
             nutrition_data = st.session_state['nutrition_data']
             serving_size = st.session_state['serving_size']
             standard = st.session_state['standard']
+            ocr_text = st.session_state.get('ocr_text', '')
             
             with col2:
                 st.markdown("### 📊 Nutrition Facts")
                 st.markdown(f"**Per {serving_size}g serving**")
+                
+                # Show extracted text in expander
+                if ocr_text:
+                    with st.expander("🔍 View Extracted Text (Debug)"):
+                        st.text_area("OCR Output", ocr_text, height=150)
                 
                 # Daily values
                 if standard == "EU":
