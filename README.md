@@ -440,6 +440,7 @@ elif mode == "premium":
 - **LLaVA-1.5** - Advanced vision-language model
 - **GPT-4o Vision** - Premium analysis (OpenAI API)
 - **Transformers** (Hugging Face) - Model management
+  
 
 ### Database & Search
 - **SQLite** - Product database
@@ -467,8 +468,6 @@ elif mode == "premium":
 - CUDA-capable GPU (optional, but recommended)
   - Minimum: 6GB VRAM (e.g., RTX 3060)
   - Recommended: 8GB+ VRAM
-- 20GB+ free disk space
-- 16GB+ RAM
 
 ### Step 1: Clone Repository
 
