@@ -56,7 +56,7 @@ Result: 7,271 products with nutrition & allergen data
 - ✅ Completely FREE (no API limits or costs)
 - ✅ 100% offline processing
 - ✅ Full control over data quality
-- ✅ Privacy-preserving (no external API calls)
+- ✅ no external API calls
 - ✅ Reproducible pipeline
 
 ### Dataset Composition
